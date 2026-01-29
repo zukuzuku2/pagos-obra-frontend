@@ -1,4 +1,4 @@
-const API_URL = 'http://192.168.1.118:3001/api'; // Cambiar por IP del servidor en red
+const API_URL = 'http://192.168.1.118:3003/api'; // Cambiar por IP del servidor en red
 
 // Validación de URL para prevenir SSRF
 const validateApiUrl = (url) => {
