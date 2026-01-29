@@ -5,7 +5,7 @@ const validateApiUrl = (url) => {
   try {
     const urlObj = new URL(url);
     const allowedHosts = ['localhost', '127.0.0.1'];
-    const allowedPorts = ['3001'];
+    const allowedPorts = ['3001', '3003'];
     
     // Permitir IPs de red local
     const isLocalNetwork = /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/.test(urlObj.hostname);
