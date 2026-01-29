@@ -7,6 +7,7 @@ import ErrorMessage from './components/ErrorMessage';
 import ResumenFinanciero from './components/ResumenFinanciero';
 import FormularioTrabajo from './components/FormularioTrabajo';
 import ListaTrabajos from './components/ListaTrabajos';
+import ConfirmModal from './components/ConfirmModal';
 
 // Servicios
 import apiService from './services/apiService';
@@ -19,6 +20,8 @@ function App() {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [trabajoToDelete, setTrabajoToDelete] = useState(null);
   const [formData, setFormData] = useState({
     nombre: '',
     descripcion: '',
@@ -120,19 +123,30 @@ function App() {
     }
   };
 
-  const eliminarTrabajo = async (id) => {
-    if (window.confirm('¿Estás seguro de eliminar este trabajo?')) {
-      try {
-        setLoading(true);
-        setError(null);
-        await apiService.deleteTrabajo(id);
-        await fetchTrabajos();
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
+  const eliminarTrabajo = (id) => {
+    const trabajo = trabajos.find(t => t.id === id);
+    setTrabajoToDelete({ id, nombre: trabajo.nombre });
+    setShowConfirmModal(true);
+  };
+
+  const confirmarEliminacion = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      await apiService.deleteTrabajo(trabajoToDelete.id);
+      await fetchTrabajos();
+      setShowConfirmModal(false);
+      setTrabajoToDelete(null);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const cancelarEliminacion = () => {
+    setShowConfirmModal(false);
+    setTrabajoToDelete(null);
   };
 
   const handleGenerarPDFCompleto = () => {
@@ -201,6 +215,16 @@ function App() {
         onMarcarPagado={marcarPagado}
         onEliminar={eliminarTrabajo}
         loading={loading}
+      />
+
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        onConfirm={confirmarEliminacion}
+        onCancel={cancelarEliminacion}
+        title="Confirmar Eliminación"
+        message={`¿Estás seguro de eliminar el trabajo "${trabajoToDelete?.nombre}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
       />
     </div>
   );
